@@ -3,23 +3,32 @@ package com.example.capture;
 import androidx.annotation.ColorInt;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
+import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.fonts.Font;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -29,10 +38,20 @@ public class MainActivity extends AppCompatActivity {
 
     private static ArrayList<String> phrases;
 
+    // Storage Permissions
+    private static final int REQUEST_EXTERNAL_STORAGE = 1;
+    private static String[] PERMISSIONS_STORAGE = {
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        verifyStoragePermissions(this);
+
         phrases = new ArrayList<>();
         initPhrases(phrases);
     }
@@ -66,6 +85,12 @@ public class MainActivity extends AppCompatActivity {
             // TODO: fix orientation issue when landscape photo is used
             try {
                 bitmap = BitmapFactory.decodeStream(getContentResolver().openInputStream(targetUri));
+                int rotate = checkForRotation(getRealPathFromURI(targetUri));
+                if (rotate != 0) {
+                    Matrix matrix = new Matrix();
+                    matrix.postRotate(rotate);
+                    bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+                }
                 //Bitmap capturedBitmap = captureBitmap(this);
                 //captureImage(bitmap);
                 targetImage.setImageBitmap(captureImage(bitmap));
@@ -76,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //private Bitmap captureBitmap(Context mContext) {// TODO: Refactor to also pass in desired string
-    private Bitmap captureImage(Bitmap bitmap) {
+    private Bitmap captureImage(Bitmap bitmap) { // TODO: Refactor to pass in reference to Bitmap, not Bitmap object (too memory heavy)
         // Constants
         int COLUMN_STEP_SIZE = 50;
         int ROW_STEP_SIZE = 50;
@@ -185,7 +210,7 @@ public class MainActivity extends AppCompatActivity {
         String str = phrases.get(random.nextInt(phrases.size() + 1));
 
         canvas.drawBitmap(capturedBmp, 0, 0, paint);
-        int x = random.nextInt(width - 100);
+        int x = random.nextInt(width - 100); // TODO: Fix this so that it uses a similar "empty space detection" algo as in the y direction to optimize location
         int y = (minStDevIndex + 1) * ROW_STEP_SIZE;
         canvas.drawText(str, x, y, paint);
 
@@ -199,6 +224,73 @@ public class MainActivity extends AppCompatActivity {
         // Counting the perceptive luminance - human eye favours green colour
         double a = 1 - (0.299 * Color.red(color) + 0.587 * Color.green(color) + 0.114 * Color.blue(color)) / 255;
         return (a < 0.5) ? Color.BLACK : Color.WHITE;
+    }
+
+    private static int checkForRotation(String imageFilePath) {
+        int rotate = 0;
+        try {
+            ExifInterface exif;
+
+            exif = new ExifInterface(imageFilePath);
+            String exifOrientation = exif
+                    .getAttribute(ExifInterface.TAG_ORIENTATION);
+            int orientation = exif.getAttributeInt(
+                    ExifInterface.TAG_ORIENTATION,
+                    ExifInterface.ORIENTATION_NORMAL);
+            switch (orientation) {
+                case ExifInterface.ORIENTATION_ROTATE_270:
+                    rotate = 270;
+                    break;
+                case ExifInterface.ORIENTATION_ROTATE_180:
+                    rotate = 180;
+                    break;
+                case ExifInterface.ORIENTATION_ROTATE_90:
+                    rotate = 90;
+                    break;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return rotate;
+    }
+
+    public String getRealPathFromURI(Uri contentUri) {
+        Cursor cursor = null;
+        try {
+            String[] proj = {MediaStore.Images.Media.DATA};
+            cursor = getContentResolver().query(contentUri, proj, null, null,
+                    null);
+            int column_index = cursor
+                    .getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+            cursor.moveToFirst();
+            return cursor.getString(column_index);
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+    }
+
+    /**
+     * Checks if the app has permission to write to device storage
+     *
+     * If the app does not has permission then the user will be prompted to grant permissions
+     *
+     * @param activity
+     */
+    public static void verifyStoragePermissions(Activity activity) {
+        // Check if we have write permission
+        int permission = ActivityCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
+        if (permission != PackageManager.PERMISSION_GRANTED) {
+            // We don't have permission so prompt the user
+            ActivityCompat.requestPermissions(
+                    activity,
+                    PERMISSIONS_STORAGE,
+                    REQUEST_EXTERNAL_STORAGE
+            );
+        }
     }
 
     private static void initPhrases(ArrayList<String> phrases) {
