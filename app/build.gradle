@@ -5,7 +5,7 @@ android {
     buildToolsVersion "29.0.0"
     defaultConfig {
         applicationId "com.example.capture"
-        minSdkVersion 29
+        minSdkVersion 28
         targetSdkVersion 29
         versionCode 1
         versionName "1.0"
