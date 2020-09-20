@@ -42,7 +42,7 @@ import java.util.Iterator;
 import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
-
+//doggos
     private static ArrayList<String> phrases;
 
     // Storage Permissions
@@ -385,5 +385,22 @@ public class MainActivity extends AppCompatActivity {
         phrases.add("Everything fits if you're brave enough ;)");
         phrases.add("it's not the size that counts. It's how you use it!");
         phrases.add("Ah, to be young and in love...");
+        phrases.add("I’m here wondering: Was I Am Legend was based on a true story?");
+        phrases.add("Well well well...we meet again");
+        phrases.add("They see me rollin’ They hatin’");
+        phrases.add("+1 to negotiation");
+        phrases.add("I would not last in prison");
+        phrases.add("Life gave me lemons. Now I’m here");
+        phrases.add("You know what would make this better? Baby wipes");
+        phrases.add("Ok Boomer");
+        phrases.add("Can you tell I don’t wanna be here?");
+        phrases.add("RIP my thighs");
+        phrases.add("Here for a liver transplant. Not a long time.");
+        phrases.add("Apply directly to the forehead");
+        phrases.add("Send Dudes");
+        phrases.add("Sand Nudes");
+        phrases.add("Nend Sudes");
+        phrases.add("The only language I speak is beef");
+
     }
 }
