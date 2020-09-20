@@ -37,4 +37,14 @@
         tools:layout_editor_absoluteX="21dp"
         tools:srcCompat="@tools:sample/avatars" />
 
+    <Button
+        android:id="@+id/btnShare"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:onClick="btnShareOnClick"
+        android:text="Share!"
+        app:layout_constraintStart_toEndOf="@+id/btnAccessGallery"
+        tools:layout_editor_absoluteY="103dp" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

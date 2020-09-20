@@ -81,6 +81,11 @@ public class MainActivity extends AppCompatActivity {
         startActivityForResult(intent, 0);
     }
 
+    // Dennis' sharing button
+    public void btnShareOnClick(View view) {
+        Toast.makeText(getApplicationContext(), "Dennis let's share our creation!", Toast.LENGTH_SHORT).show();
+    }
+
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
