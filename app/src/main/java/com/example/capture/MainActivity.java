@@ -186,12 +186,12 @@ public class MainActivity extends AppCompatActivity {
 
         canvas.drawBitmap(capturedBmp, 0, 0, paint);
         int x = random.nextInt(width - 100);
-        int y = (minStDevIndex + 1) * 100;
+        int y = (minStDevIndex + 1) * ROW_STEP_SIZE;
         canvas.drawText(str, x, y, paint);
 
         // TODO: Remove this
-        Toast.makeText(getApplicationContext(), x + ", " + y + ": " + str, Toast.LENGTH_LONG).show();
-
+        //Toast.makeText(getApplicationContext(), x + ", " + y + ": " + str, Toast.LENGTH_LONG).show();
+        Toast.makeText(getApplicationContext(), x + ", " + y + ": " + "|| w:" + width + ", h: " + height, Toast.LENGTH_LONG).show();
         return capturedBmp;
     }
 
