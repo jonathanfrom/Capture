@@ -35,7 +35,7 @@ import java.util.Iterator;
 import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
-
+//doggos
     private static ArrayList<String> phrases;
 
     // Storage Permissions
