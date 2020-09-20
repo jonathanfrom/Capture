@@ -154,11 +154,16 @@ public class MainActivity extends AppCompatActivity {
             mean = 0;
 
             for(int col = COLUMN_STEP_SIZE; col < width; col += COLUMN_STEP_SIZE) {
-                //Color c = capturedBmp.getColor(col, row);
-                Color c = bitmap.getColor(col, row);
-                r = (c.toArgb() >> 16) & 0xff;//c.red();
-                g = (c.toArgb() >> 8) & 0xff;//c.green();
-                b = c.toArgb() & 0xff;//c.blue();
+                //Color c = bitmap.getColor(col, row); // TODO: Fix fatal error when using API level 28 (method doesn't exist)
+                //r = (c.toArgb() >> 16) & 0xff;//c.red();
+                //g = (c.toArgb() >> 8) & 0xff;//c.green();
+                //b = c.toArgb() & 0xff;//c.blue();
+
+                // TODO: Confirm this fixes the fatal error on Dennis' device
+                int c = bitmap.getPixel(col, row);
+                r = (c >> 16) & 0xff;//c.red();
+                g = (c >> 8) & 0xff;//c.green();
+                b = c & 0xff;//c.blue();
 
                 pixelCount++;
                 redBucket += r;
