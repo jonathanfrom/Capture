@@ -111,13 +111,10 @@ public class MainActivity extends AppCompatActivity {
         int height = bitmap.getHeight();
 
         // Standard deviation variables
-        int sum = 0;
-        int squareSum = 0;
-        double squareMean;
-        double stDev;
-        ArrayList<Double> rowStDev = new ArrayList<>();
         double mean;
         double squareDiffMean;
+        double stDev;
+        ArrayList<Double> rowStDev = new ArrayList<>();
 
         int r;
         int g;
@@ -134,6 +131,16 @@ public class MainActivity extends AppCompatActivity {
 
         //Bitmap capturedBmp = Bitmap.createBitmap(bitmap);
         Bitmap capturedBmp = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+
+        /* Ideal empty space finding algorithm:
+        Iterate over a percentage of image pixels (every ROW_STEP_SIZE and COL_STEP_SIZE), and store
+        the grayscale value of this subset of pixels in a 2D ArrayList<Double>. Calculate standard
+        deviation for each row and column outside of main iteration loop (should help reduce operating
+        time (O(n^2) as opposed to current O(n^3)). Empty row for text location should effectively
+        remain unchanged. Apply same approach to locate optimal column to centre the text around.
+         */
+
+        // TODO: Add support for handling edge (no pun intended) cases of text in last row/col of picture
 
         int minStDevIndex;
         for(int row = ROW_STEP_SIZE; row < height; row += ROW_STEP_SIZE) {
@@ -168,18 +175,6 @@ public class MainActivity extends AppCompatActivity {
 
                 mean += gray;
             }
-
-            /*Integer colourVal = 0;
-            Iterator grayIter;
-            for(grayIter = grayRow.iterator(); grayIter.hasNext();
-                squareSum = (int)((double)squareSum + Math.pow((double)colourVal, 2))) {
-                colourVal = (Integer)grayIter.next();
-                sum += colourVal;
-            }
-
-            squareMean = Math.pow((double)sum, 2) / (double)grayRow.size();
-            stDev = Math.sqrt((double)squareSum - squareMean) / (double)grayRow.size();
-            rowStDev.add(stDev);*/
 
             mean = mean / grayRow.size();
             squareDiffMean = 0;
@@ -216,7 +211,7 @@ public class MainActivity extends AppCompatActivity {
 
         // TODO: Remove this
         //Toast.makeText(getApplicationContext(), x + ", " + y + ": " + str, Toast.LENGTH_LONG).show();
-        Toast.makeText(getApplicationContext(), x + ", " + y + ": " + "|| w:" + width + ", h: " + height, Toast.LENGTH_LONG).show();
+        //Toast.makeText(getApplicationContext(), x + ", " + y + ": " + "|| w:" + width + ", h: " + height, Toast.LENGTH_LONG).show();
         return capturedBmp;
     }
 
