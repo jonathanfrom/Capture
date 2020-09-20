@@ -8,6 +8,7 @@ import androidx.core.app.ActivityCompat;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -22,15 +23,21 @@ import android.graphics.fonts.Font;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.Random;
 
@@ -93,7 +100,13 @@ public class MainActivity extends AppCompatActivity {
                 }
                 //Bitmap capturedBitmap = captureBitmap(this);
                 //captureImage(bitmap);
-                targetImage.setImageBitmap(captureImage(bitmap));
+                Bitmap capturedImage = captureImage(bitmap);
+                targetImage.setImageBitmap(capturedImage);
+
+                // TODO: Save this in a "Capture" folder on device
+                String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+                MediaStore.Images.Media.insertImage(getContentResolver(), capturedImage, "Capture_" + timeStamp, "");
+                //createDirectoryAndSaveFile(capturedImage, "Capture_" + timeStamp);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
@@ -290,6 +303,44 @@ public class MainActivity extends AppCompatActivity {
                     PERMISSIONS_STORAGE,
                     REQUEST_EXTERNAL_STORAGE
             );
+        }
+    }
+
+    private void createDirectoryAndSaveFile(Bitmap imageToSave, String fileName) { // TODO: Refactor this into two separate functions
+
+        /*
+        File directory = new File(Environment.getExternalStorageDirectory() + "/Capture/");
+
+        if (!directory.exists()) {
+            directory = new File(Environment.getExternalStorageDirectory().getPath() + "/Capture/");
+            directory.mkdirs();
+        }
+
+        File file = new File(directory, fileName);
+        if (file.exists()) {
+            file.delete();
+        }
+        try {
+            FileOutputStream out = new FileOutputStream(file);
+            imageToSave.compress(Bitmap.CompressFormat.JPEG, 100, out);
+            out.flush();
+            out.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }*/
+
+        ContextWrapper cw = new ContextWrapper(getApplicationContext());
+        File directory = cw.getDir("Capture2", Context.MODE_PRIVATE);
+
+        File mypath = new File(directory, fileName);
+
+        FileOutputStream fos;
+        try {
+            fos = new FileOutputStream(mypath);
+            imageToSave.compress(Bitmap.CompressFormat.PNG, 100, fos);
+            fos.close();
+        } catch (Exception e) {
+            Log.e("SAVE_IMAGE", e.getMessage(), e);
         }
     }
 
