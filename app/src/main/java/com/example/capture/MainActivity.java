@@ -216,9 +216,10 @@ public class MainActivity extends AppCompatActivity {
         canvas.drawBitmap(bitmap, 0, 0, null);
         Paint paint = new Paint();
         paint.setColor(getContrastColor(averageColor.get(minStDevIndex))); //
-        String hexColor = String.format("#%06X", (0xFFFFFF & paint.getColor()));
-        Toast.makeText(getApplicationContext(), hexColor + "", Toast.LENGTH_SHORT).show();
-        paint.setTextSize(100); // TODO: Refine size and scaling factors
+        //String hexColor = String.format("#%06X", (0xFFFFFF & paint.getColor()));
+        //Toast.makeText(getApplicationContext(), hexColor + "", Toast.LENGTH_SHORT).show();
+        //paint.setTextSize(100); // TODO: Refine size and scaling factors
+        paint.setTextSize((float) 0.029 * Math.max(width, height));
         paint.setTextScaleX(1);
         // TODO: Any more text settings to play with? Font?
 
