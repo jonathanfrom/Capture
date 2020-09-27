@@ -88,6 +88,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void btnCameraOnClick(View view) {
         Toast.makeText(getApplicationContext(), "Open up the camera", Toast.LENGTH_SHORT).show();
+        // Start camera intent...
     }
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
