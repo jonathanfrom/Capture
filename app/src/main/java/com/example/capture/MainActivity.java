@@ -451,10 +451,10 @@ public class MainActivity extends AppCompatActivity {
         phrases.add("No Officer, it’s Hi, How are you?");
         phrases.add("I never run with scissors");
         phrases.add("That's a yikers!");
-        phrases.add("Everything fits if you're brave enough ;)");
+        phrases.add("Everything fits if you're brave enough");
         phrases.add("it's not the size that counts. It's how you use it!");
         phrases.add("Ah, to be young and in love...");
-        phrases.add("I’m here wondering: Was I Am Legend was based on a true story?");
+        phrases.add("I’m here wondering: Was I Am Legend based on a true story?");
         phrases.add("Well well well...we meet again");
         phrases.add("They see me rollin’ They hatin’");
         phrases.add("+1 to negotiation");
@@ -473,3 +473,4 @@ public class MainActivity extends AppCompatActivity {
 
     }
 }
+
