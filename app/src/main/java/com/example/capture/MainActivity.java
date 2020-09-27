@@ -147,6 +147,8 @@ public class MainActivity extends AppCompatActivity {
 
         int gray;
 
+
+
         //Bitmap capturedBmp = Bitmap.createBitmap(bitmap);
         Bitmap capturedBmp = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
 
@@ -172,12 +174,6 @@ public class MainActivity extends AppCompatActivity {
             mean = 0;
 
             for(int col = COLUMN_STEP_SIZE; col < width; col += COLUMN_STEP_SIZE) {
-                //Color c = bitmap.getColor(col, row); // TODO: Fix fatal error when using API level 28 (method doesn't exist)
-                //r = (c.toArgb() >> 16) & 0xff;//c.red();
-                //g = (c.toArgb() >> 8) & 0xff;//c.green();
-                //b = c.toArgb() & 0xff;//c.blue();
-
-                // TODO: Confirm this fixes the fatal error on Dennis' device
                 int c = bitmap.getPixel(col, row);
                 r = (c >> 16) & 0xff;//c.red();
                 g = (c >> 8) & 0xff;//c.green();
@@ -220,6 +216,8 @@ public class MainActivity extends AppCompatActivity {
         canvas.drawBitmap(bitmap, 0, 0, null);
         Paint paint = new Paint();
         paint.setColor(getContrastColor(averageColor.get(minStDevIndex))); //
+        String hexColor = String.format("#%06X", (0xFFFFFF & paint.getColor()));
+        Toast.makeText(getApplicationContext(), hexColor + "", Toast.LENGTH_SHORT).show();
         paint.setTextSize(100); // TODO: Refine size and scaling factors
         paint.setTextScaleX(1);
         // TODO: Any more text settings to play with? Font?
@@ -227,8 +225,30 @@ public class MainActivity extends AppCompatActivity {
         Random random = new Random();
         String str = phrases.get(random.nextInt(phrases.size() + 1));
 
+        // Find optimal x location
+        ArrayList<Integer> selectedRowGrayValues = new ArrayList<>();
+        for(int col = COLUMN_STEP_SIZE; col < (width - COLUMN_STEP_SIZE); col += COLUMN_STEP_SIZE) {
+            int c = bitmap.getPixel(col, (minStDevIndex + 1) * ROW_STEP_SIZE);
+            r = (c >> 16) & 0xff;
+            g = (c >> 8) & 0xff;
+            b = c & 0xff;
+
+            gray = (int) Math.round(0.299 * r + 0.587 * g + 0.114 * b);
+            selectedRowGrayValues.add(gray);
+        }
+
+        squareDiffMean = 0;
+        ArrayList<Double> stDevCol = new ArrayList<>();
+        for (int i = 1; i < selectedRowGrayValues.size(); i++) {
+            mean = (selectedRowGrayValues.get(i - 1) + selectedRowGrayValues.get(i)) / 2;
+            squareDiffMean = (Math.pow(selectedRowGrayValues.get(i - 1) - mean, 2) + Math.pow(selectedRowGrayValues.get(i) - mean, 2)) / 2;
+            stDevCol.add(Math.sqrt(squareDiffMean));
+        }
+
+        int minStDevCol = stDevCol.indexOf(Collections.min(stDevCol));
+
         canvas.drawBitmap(capturedBmp, 0, 0, paint);
-        int x = random.nextInt(width - 100); // TODO: Fix this so that it uses a similar "empty space detection" algo as in the y direction to optimize location
+        int x = (minStDevCol + 1) * COLUMN_STEP_SIZE; //random.nextInt(width - 100); // TODO: Fix this so that it uses a similar "empty space detection" algo as in the y direction to optimize location
         int y = (minStDevIndex + 1) * ROW_STEP_SIZE;
         canvas.drawText(str, x, y, paint);
 
