@@ -42,7 +42,7 @@ import java.util.Iterator;
 import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
-//doggos
+
     private static ArrayList<String> phrases;
 
     // Storage Permissions
@@ -86,6 +86,10 @@ public class MainActivity extends AppCompatActivity {
         Toast.makeText(getApplicationContext(), "Dennis let's share our creation!", Toast.LENGTH_SHORT).show();
     }
 
+    public void btnCameraOnClick(View view) {
+        Toast.makeText(getApplicationContext(), "Open up the camera", Toast.LENGTH_SHORT).show();
+    }
+
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
@@ -123,6 +127,8 @@ public class MainActivity extends AppCompatActivity {
         // Constants
         int COLUMN_STEP_SIZE = 50;
         int ROW_STEP_SIZE = 50;
+
+        int PIXEL_BUFFER = 5;
 
         // Size of image
         int width = bitmap.getWidth();
@@ -252,27 +258,38 @@ public class MainActivity extends AppCompatActivity {
         int minStDevCol = stDevCol.indexOf(Collections.min(stDevCol));
 
         canvas.drawBitmap(capturedBmp, 0, 0, paint);
-        int x = (minStDevCol + 1) * COLUMN_STEP_SIZE; //random.nextInt(width - 100); // TODO: Fix this so that it uses a similar "empty space detection" algo as in the y direction to optimize location
+        int x = (minStDevCol + 1) * COLUMN_STEP_SIZE;
         int y = (minStDevIndex + 1) * ROW_STEP_SIZE;
 
 
         // Size caption to fit
         paint.setTextSize((float) 0.029 * Math.max(width, height));
-        int textWidth = (int) Math.round(paint.measureText(str));
         int overshoot = 0;
-        if ((x + textWidth) > width) {
-            overshoot = (x + textWidth) - width;
-            if (overshoot < (0.2 * width)){
+
+
+
+        int textWidth = (int) Math.round(paint.measureText(str));
+
+        if ((x + textWidth) > (width - PIXEL_BUFFER)) {
+            overshoot = (x + textWidth) - width + PIXEL_BUFFER;
+            if (overshoot < (0.2 * (width))){ // if overshoot is less than 20% of image width, just shift image over
                 x -= overshoot;
             }
 
-            if ((x + textWidth) > width) {
-                paint.setTextSize((float) 0.019 * Math.max(width, height));
+            // overshoot is greater than 20% but caption still fits within image boundaries
+            if ((Math.abs(x) + textWidth) > (width - PIXEL_BUFFER)) {
+                paint.setTextSize((float) 0.023 * Math.max(width, height));
                 x -= (int) Math.round((x + paint.measureText(str)) - width);
             }
         }
 
-
+        // if caption is just flat out too big for image
+        double scalingFactor = 0.003;
+        while ((paint.measureText(str)) > (width - PIXEL_BUFFER)) {
+            x = PIXEL_BUFFER; //(width - 2 * PIXEL_BUFFER); // TODO: position with a random offset from centred
+            paint.setTextSize((float) (0.029 - scalingFactor) * Math.max(width, height));
+            scalingFactor += 0.003;
+        }
 
 
 
