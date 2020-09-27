@@ -220,11 +220,14 @@ public class MainActivity extends AppCompatActivity {
         //Toast.makeText(getApplicationContext(), hexColor + "", Toast.LENGTH_SHORT).show();
         //paint.setTextSize(100); // TODO: Refine size and scaling factors
         paint.setTextSize((float) 0.029 * Math.max(width, height));
-        paint.setTextScaleX(1);
+        //paint.setTextScaleX(1);
         // TODO: Any more text settings to play with? Font?
+        //paint.setTypeface();
+        //paint.measureText()
 
         Random random = new Random();
-        String str = phrases.get(random.nextInt(phrases.size() + 1));
+        String str = "I’m here wondering: Was I Am Legend was based on a true story?";
+                // phrases.get(random.nextInt(phrases.size() + 1));
 
         // Find optimal x location
         ArrayList<Integer> selectedRowGrayValues = new ArrayList<>();
@@ -251,6 +254,28 @@ public class MainActivity extends AppCompatActivity {
         canvas.drawBitmap(capturedBmp, 0, 0, paint);
         int x = (minStDevCol + 1) * COLUMN_STEP_SIZE; //random.nextInt(width - 100); // TODO: Fix this so that it uses a similar "empty space detection" algo as in the y direction to optimize location
         int y = (minStDevIndex + 1) * ROW_STEP_SIZE;
+
+
+        // Size caption to fit
+        paint.setTextSize((float) 0.029 * Math.max(width, height));
+        int textWidth = (int) Math.round(paint.measureText(str));
+        int overshoot = 0;
+        if ((x + textWidth) > width) {
+            overshoot = (x + textWidth) - width;
+            if (overshoot < (0.2 * width)){
+                x -= overshoot;
+            }
+
+            if ((x + textWidth) > width) {
+                paint.setTextSize((float) 0.019 * Math.max(width, height));
+                x -= (int) Math.round((x + paint.measureText(str)) - width);
+            }
+        }
+
+
+
+
+
         canvas.drawText(str, x, y, paint);
 
         // TODO: Remove this
